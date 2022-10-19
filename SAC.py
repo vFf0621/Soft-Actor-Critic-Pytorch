@@ -217,10 +217,10 @@ class SAC:
         self.critic1.optim.zero_grad()
         self.critic2.optim.zero_grad()
         q_hat = 2*reward + self.gamma*value_
-        q1_old_policy = self.critic1.forward(state, action).view(-1)
-        q2_old_policy = self.critic2.forward(state, action).view(-1)
-        q_1 = self.loss(q1_old_policy, q_hat)
-        q_2 = self.loss(q2_old_policy, q_hat)
+        q1_replay = self.critic1.forward(state, action).view(-1)
+        q2_replay = self.critic2.forward(state, action).view(-1)
+        q_1 = self.loss(q1_replay, q_hat)
+        q_2 = self.loss(q2_replay, q_hat)
 
         q = q_1 + q_2
         q.backward()
