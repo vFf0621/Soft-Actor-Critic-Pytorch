@@ -128,12 +128,12 @@ class SAC:
         self.value = Value(env).to(self.device)
         self.target_value = Value(env).to(self.device)
         self.value.load_state_dict(self.target_value.state_dict())
-        s = env.reset()
+        s = env.reset()[0]
         for i in range(100):
             done = False
             while not done:
                 action = self.env.action_space.sample()
-                s_, reward, done, _= self.env.step(action)
+                s_, reward, done, _, _ = self.env.step(action)
                 self.replay_buffer.append((s, action, s_, reward, done))
                 s = s_
     def act(self, state):
