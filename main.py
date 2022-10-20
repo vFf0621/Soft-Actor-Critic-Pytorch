@@ -46,8 +46,5 @@ if __name__ == '__main__':
         while not done:
             action = agent.act(s)
             s_, r, done, _ = env.step(action)
-            agent.replay_buffer.append((s, action, s_, r, done))
             s = s_
-            episode_reward += r
-            agent.train()
             env.render()
