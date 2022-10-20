@@ -41,7 +41,6 @@ if __name__ == '__main__':
     
     while True: 
         done = False
-        episode_reward = 0
         s = env.reset()
         while not done:
             action = agent.act(s)
