@@ -38,7 +38,7 @@ if __name__ == '__main__':
         print("Episode Reward", episode_reward, ", Average Reward", 
               mean)
     plt.plot(xs, ys)
-    
+    env = gym.make('MountainCarContinuous-v0', render_mode="human")
     while True: 
         done = False
         s = env.reset()[0]
@@ -46,4 +46,3 @@ if __name__ == '__main__':
             action = agent.act(s)
             s_, r, done, _, _ = env.step(action)
             s = s_
-            env.render()
