@@ -184,47 +184,31 @@ class SAC:
 
         state, action, state_, reward, done = self.sample()
 
-        value = self.value(state).view(-1)
-        value_ = self.target_value(state_).view(-1)
-        value_[done] = 0.0
-
-        actions, log_probs = self.actor.sample(state, False)
-        log_probs = log_probs.view(-1)
-        q1_ = self.critic1.forward(state, actions)
-        q2_ = self.critic2.forward(state, actions)
-        critic_value = torch.min(q1_, q2_)
-        critic_value = critic_value.view(-1)
-
+       
+        v_ = reward + self.gamma*self.target_value(state_).view(-1)
+        v = self.value(state).view(-1)
+        v[done] = 0.0
+        act, log_probs = self.actor.sample(state, False)
+        q = torch.min(self.critic1(state,act), self.critic2(state, act)).view(-1)
+        q_ = q-log_probs.view(-1)*self.alpha
         self.value.optim.zero_grad()
-        value_target = critic_value - self.alpha*log_probs
-        value_loss = self.loss(value, value_target)
-        value_loss.backward(retain_graph=True)
+        loss = self.loss(v, q_)
+        loss.backward(retain_graph=True)
         self.value.optim.step()
-
-        actions, log_probs = self.actor.sample(state, True)
-        log_probs = log_probs.view(-1)
-        q1_ = self.critic1.forward(state, actions)
-        q2_ = self.critic2.forward(state, actions)
-        critic_value = torch.min(q1_, q2_)
-        critic_value = critic_value.view(-1)
-        
-        actor_loss = self.alpha * log_probs - critic_value
-        actor_loss = torch.mean(actor_loss)
-        self.actor.optim.zero_grad()
-        actor_loss.backward(retain_graph=True)
-        self.actor.optim.step()
-
         self.critic1.optim.zero_grad()
         self.critic2.optim.zero_grad()
-        q_hat = 2*reward + self.gamma*value_
-        q1_replay = self.critic1.forward(state, action).view(-1)
-        q2_replay = self.critic2.forward(state, action).view(-1)
-        q_1 = self.loss(q1_replay, q_hat)
-        q_2 = self.loss(q2_replay, q_hat)
-
-        q = q_1 + q_2
-        q.backward()
+        c1loss = self.loss( self.critic1(state, action).view(-1),v_)
+        c2loss = self.loss( self.critic2(state, action).view(-1), v_)
+        c1loss.backward(retain_graph=True)
+        c2loss.backward(retain_graph=True)
         self.critic1.optim.step()
         self.critic2.optim.step()
-
+        act, log_probs = self.actor.sample(state, True)
+        q = torch.min(self.critic1(state,act), self.critic2(state, act)).view(-1)
+        self.actor.optim.zero_grad()
+        actor_loss = -torch.mean(q-self.alpha*log_probs.view(-1))
+        actor_loss.backward()
+        self.actor.optim.step()
         self.soft_update()
+        
+        
