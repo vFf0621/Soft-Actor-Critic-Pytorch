@@ -187,7 +187,7 @@ class SAC:
        
         v_ = reward + self.gamma*self.target_value(state_).view(-1)
         v = self.value(state).view(-1)
-        v[done] = 0.0
+        v_[done] = 0.0
         act, log_probs = self.actor.sample(state, False)
         q = torch.min(self.critic1(state,act), self.critic2(state, act)).view(-1)
         q_ = q-log_probs.view(-1)*self.alpha
