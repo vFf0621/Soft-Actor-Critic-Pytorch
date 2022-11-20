@@ -9,7 +9,7 @@ Gym v0.26.2
 
 Mujoco 2.3.0
 
-This is the plot and video running on LunarLander-v2 Environment:
+This is the average of 100 episode reward plot and video running on LunarLander-v2 Environment:
 ![LunarLander-v2-Plot](https://user-images.githubusercontent.com/29249318/202924171-180c427e-b6cb-448f-98c1-61df02d44854.png)
 
 
