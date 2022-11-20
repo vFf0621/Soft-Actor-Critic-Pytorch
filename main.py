@@ -36,7 +36,7 @@ if __name__ == '__main__':
         print("Episode Reward", episode_reward, ", Average Reward", 
               mean)
     plt.plot(xs, ys)
-    env = gym.make('MountainCarContinuous-v0', render_mode="human")
+    env = gym.make('LunarLanderContinuous-v2', render_mode="human")
     while True: 
         done = False
         s = env.reset()[0]
