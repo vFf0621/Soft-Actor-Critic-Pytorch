@@ -5,11 +5,9 @@ Created on Wed Jun 29 19:04:16 2022
 
 @author: guanfei1
 """
-import pybullet_envs
 
 import gym
 import numpy as np
-from gym import wrappers
 from SAC import *
 import matplotlib.pyplot as plt
 if __name__ == '__main__':
