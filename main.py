@@ -8,14 +8,16 @@ Created on Wed Jun 29 19:04:16 2022
 
 import gym
 import numpy as np
+from gym import wrappers
 from SAC import *
 import matplotlib.pyplot as plt
 if __name__ == '__main__':
-    env = gym.make('LunarLanderContinuous-v2')
+    env=gym.make("Walker2d-v4", render_mode="human")
+
     
     agent = SAC(env)
     ys = []
-    eps = 1500
+    eps = 2000
     xs = list(range(eps))
     print("Replay Buffer Initialized")
     for j in range(eps):
@@ -36,7 +38,7 @@ if __name__ == '__main__':
         print("Episode Reward", episode_reward, ", Average Reward", 
               mean)
     plt.plot(xs, ys)
-    env = gym.make('LunarLanderContinuous-v2', render_mode="human")
+    env = gym.make('Walker2d-v4', render_mode="human")
     while True: 
         done = False
         s = env.reset()[0]
