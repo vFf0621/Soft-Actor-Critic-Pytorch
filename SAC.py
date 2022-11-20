@@ -7,6 +7,7 @@ Created on Sun Sep 11 10:29:38 2022
 """
 
 
+
 import torch
 from torch import optim
 from torch import nn
@@ -15,6 +16,7 @@ from torch.distributions import Normal
 import gym
 import random
 import numpy as np
+import time
 class Actor(nn.Module):
     def __init__(self, env, device, hidden = 200, lr = 0.0001):
         super().__init__()
@@ -40,7 +42,7 @@ class Actor(nn.Module):
         mu = self.mu(x)
         sigma = self.sigma(x)
 
-        sigma = torch.clamp(sigma, min=10e-8, max=1)
+        sigma = torch.clamp(sigma, min=10e-8, max=10)
 
         return mu, sigma        
     
@@ -55,7 +57,7 @@ class Actor(nn.Module):
 
         action = self.tanh(actions)*self.action_high
         log_probs = probabilities.log_prob(actions)
-        log_probs -= torch.log(1-action.pow(2)+10e-6)
+        log_probs -= torch.log(1-action.pow(2)+10e-8)
         log_probs = log_probs.unsqueeze(-1)
         log_probs = log_probs.sum(1, keepdim=True)
 
@@ -88,10 +90,11 @@ class Value(nn.Module):
 class Critic(nn.Module):
     def __init__(self, env, hidden=200, lr = 0.0001):
         super().__init__()
-        self.linear1= nn.Linear(env.observation_space.shape[0], 
+        self.linear1= nn.Linear(env.observation_space.shape[0] + 
+                                env.action_space.shape[0], 
                                            hidden + 100)
         self.relu=nn.ReLU()
-        self.linear2 = nn.Linear(hidden + 100 + env.action_space.shape[0],
+        self.linear2 = nn.Linear(hidden + 100,
             hidden)
                                  
         self.linear3 = nn.Linear(hidden, 1)
@@ -100,9 +103,9 @@ class Critic(nn.Module):
     def forward(self, state, action):
         if len(action.shape) < len(state.shape):
             action = action.unsqueeze(-1)
-        x = self.linear1(state)
+        x = self.linear1(torch.cat([state, action], dim=1))
         x = self.relu(x)
-        x = self.linear2(torch.cat([x, action], dim=1))
+        x = self.linear2(x)
         x = self.relu(x)
         x = self.linear3(x)
 
@@ -122,7 +125,7 @@ class SAC:
 
         self.replay_buffer = deque(maxlen=1000000)
         self.loss = torch.nn.MSELoss()
-        self.reward_buffer = deque(maxlen=1000)
+        self.reward_buffer = deque(maxlen=100)
         self.alpha = 0.2
         
         self.value = Value(env).to(self.device)
@@ -150,7 +153,7 @@ class SAC:
                                  (1 - self.tau) * value_hat.data)
 
 
-    def sample(self, batch_size = 64):
+    def sample(self, batch_size = 100):
         t = random.sample(self.replay_buffer, batch_size)
         actions = []
         states = []
@@ -211,4 +214,6 @@ class SAC:
         self.actor.optim.step()
         self.soft_update()
         
+        
+
         
