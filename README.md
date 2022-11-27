@@ -21,4 +21,8 @@ This is the average of 100 episode reward plot and video running on LunarLander-
 
 Walker2d-v4 Environment
 
+![foo](https://user-images.githubusercontent.com/29249318/204163596-75c7fdc5-e906-4029-ac28-e5588d50366f.png)
+
+
+
 ![637ad8b9b217f571140544](https://user-images.githubusercontent.com/29249318/202943651-b006b96f-83cc-4e79-b69a-3f4676aa9654.gif)
