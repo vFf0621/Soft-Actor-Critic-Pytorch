@@ -126,7 +126,7 @@ class SAC:
         self.replay_buffer = deque(maxlen=1000000)
         self.loss = torch.nn.MSELoss()
         self.reward_buffer = deque(maxlen=100)
-        self.alpha = 0.2
+        self.alpha = 1
         
         self.value = Value(env).to(self.device)
         self.target_value = Value(env).to(self.device)
