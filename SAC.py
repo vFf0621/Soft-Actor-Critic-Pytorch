@@ -40,7 +40,7 @@ class Actor(nn.Module):
         x = self.relu(x)
 
         mu = self.mu(x)
-        sigma = self.sigma(x)
+        sigma = self.sigma(x).exp()
 
         sigma = torch.clamp(sigma, min=10e-8, max=10)
 
